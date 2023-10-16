@@ -1,0 +1,21 @@
+{
+	"name": "lab1-template",
+	"version": "1.0.0",
+	"description": "![GitHub Classroom Workflow](../../workflows/GitHub%20Classroom%20Workflow/badge.svg?branch=master)",
+	"main": "server.js",
+	"scripts": {
+		"start": "node src/server.js",
+		"test": "mocha src/server.test.js"
+	},
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"body-parser": "^1.20.2",
+		"chai": "^4.3.10",
+		"express": "^4.18.2",
+		"mocha": "^10.2.0",
+		"nodemon": "^3.0.1",
+		"pg": "^8.11.3",
+		"supertest": "^6.3.3"
+	}
+}

@@ -8,33 +8,96 @@ on:
       - master
 jobs:
   build:
-    name: Autograding
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
         with:
-          fetch-depth: 0
+          node-version: 14
 
-      # TODO build, test and deploy project
+      - name: Install dependencies
+        run: npm install
 
-      - name: Run API Tests
-        uses: matt-ball/newman-action@master
-        with:
-          collection: postman/[inst] Lab1.postman_collection.json
-          environment: postman/[inst][heroku] Lab1.postman_environment.json
-          delayRequest: 100
-          reporters: '[ "cli" ]'
+      - name: Run unit tests
+        run: npm test
 
-      - name: Autograding
-        uses: education/autograding@v1
-        continue-on-error: true
+      - name: Build Docker image
+        run: docker build -t your-app-name .
 
-      - name: Github auto grader mark
-        uses: Romanow/google-sheet-autograder-marker@v1.0
-        with:
-          google_token: ${{secrets.GOOGLE_API_KEY}}
-          sheet_id: "1xkgjUX6Qmk7rdJG-QPOToav-HWWtthJjnShIKnw3oIY"
-          homework_number: 1
-          user_column: 'D'
-          column_offset: 'F'
-          mark: "'+"
+      - name: Log in to Heroku
+        run: heroku container:login
+
+      - name: Push Docker image to Heroku Container Registry
+        run: heroku container:push web -a your-heroku-app-name
+
+      - name: Release Docker image to Heroku
+        run: heroku container:release web -a your-heroku-app-name
+  # build:
+  #   runs-on: ubuntu-latest
+
+  #   steps:
+  #     - uses: actions/checkout@v2
+
+  #     - name: Install Dependencies
+  #       run: npm install
+
+  #     - name: Run Tests
+  #       run: npm run test
+
+  #     - name: Login to DockerHub
+  #       uses: docker/login-action@v1
+  #       with:
+  #         username: ${{ secrets.DOCKERHUB_USERNAME }}
+  #         password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+  #     - name: Build and push Docker image
+  #       uses: docker/build-push-action@v2
+  #       with:
+  #         context: .
+  #         push: true
+  #         tags: ${{ secrets.DOCKERHUB_USERNAME }}/my-app:latest
+
+  #     - name: Login to Heroku
+  #       uses: akhileshns/heroku-deploy@v3.12.12
+  #       with:
+  #         heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+  #         heroku_app_name: 'Your Heroku App Name'
+  #         heroku_email: 'Your Heroku Email'
+
+  #     - name: Deploy to Heroku
+  #       run: heroku container:release web -a ${{ secrets.HEROKU_APP_NAME }}
+  # build:
+  #   name: Autograding
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #       with:
+  #         fetch-depth: 0
+
+  #     # TODO build, test and deploy project
+
+  #     - name: Run API Tests
+  #       uses: matt-ball/newman-action@master
+  #       with:
+  #         collection: postman/[inst] Lab1.postman_collection.json
+  #         environment: postman/[inst][heroku] Lab1.postman_environment.json
+  #         delayRequest: 100
+  #         reporters: '[ "cli" ]'
+
+  #     - name: Autograding
+  #       uses: education/autograding@v1
+  #       continue-on-error: true
+
+  #     - name: Github auto grader mark
+  #       uses: Romanow/google-sheet-autograder-marker@v1.0
+  #       with:
+  #         google_token: ${{secrets.GOOGLE_API_KEY}}
+  #         sheet_id: "1xkgjUX6Qmk7rdJG-QPOToav-HWWtthJjnShIKnw3oIY"
+  #         homework_number: 1
+  #         user_column: 'D'
+  #         column_offset: 'F'
+  #         mark: "'+"
