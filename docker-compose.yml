@@ -4,14 +4,12 @@ services:
     container_name: main
     build:
       context: .
-    env_file:
-      - .development.env
     volumes:
       - .:/src
       - /src/node_modules
     ports:
       - 5000:5000
-    command: npm run start
+    command: nstartpm run
     depends_on:
       - postgres
     restart: always

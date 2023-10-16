@@ -23,19 +23,10 @@ jobs:
         run: npm install
 
       - name: Run unit tests
-        run: npm test
+        run: npm run test
 
       - name: Build Docker image
         run: docker build -t your-app-name .
-
-      - name: Log in to Heroku
-        run: heroku container:login
-
-      - name: Push Docker image to Heroku Container Registry
-        run: heroku container:push web -a your-heroku-app-name
-
-      - name: Release Docker image to Heroku
-        run: heroku container:release web -a your-heroku-app-name
   # build:
   #   runs-on: ubuntu-latest
 
