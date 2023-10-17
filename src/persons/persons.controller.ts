@@ -12,11 +12,9 @@ import {
   ValidationPipe,
   HttpCode,
   HttpStatus,
-  Res,
 } from '@nestjs/common';
 import { createPerson } from './dto/createPerson.dto';
 import { PersonsService } from './persons.service';
-import { Response } from 'express';
 
 @Controller('persons')
 export class PersonsController {
@@ -40,9 +38,10 @@ export class PersonsController {
   @UsePipes(new ValidationPipe())
   @Post('/')
   @HttpCode(HttpStatus.CREATED)
-  createPerson(@Body() dto: createPerson, @Res() res: Response) {
+  createPerson(@Body() dto: createPerson) {
     this.personsService.createPerson(dto);
-    res.location(`/api/v1/persons/${dto.name}`);
+    // res.location(`/api/v1/persons/${dto.name}`);
+    return dto;
   }
 
   @Patch('/:personId')

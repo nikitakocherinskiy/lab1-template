@@ -17,7 +17,7 @@ export class PersonsService {
     return person;
   }
 
-  createPerson(dto: createPerson): void {
+  createPerson(dto: createPerson): createPerson {
     const newPerson = new createPerson();
     newPerson.id = dto.id;
     newPerson.name = dto.name;
@@ -25,6 +25,7 @@ export class PersonsService {
     newPerson.address = dto.address;
     newPerson.work = dto.work;
     this.persons.push(newPerson);
+    return newPerson;
   }
 
   updatePerson({ id, name, age, address, work }): void {

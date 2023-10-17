@@ -15,8 +15,8 @@ describe('Person API e2e tests', () => {
     await app.init();
   });
 
-  it('/app/persons (POST) - success', async () => {
-    const res = await request(app.getHttpServer()).post('/app/persons').send({
+  it('/persons (POST) - success', async () => {
+    const res = await request(app.getHttpServer()).post('/persons').send({
       id: 1,
       name: 'nikita',
       age: 21,
@@ -31,8 +31,8 @@ describe('Person API e2e tests', () => {
     expect(res.statusCode).toBe(201);
   });
 
-  it('/app/persons (POST) - fail', async () => {
-    const res = await request(app.getHttpServer()).post('/app/persons').send({
+  it('/persons (POST) - fail', async () => {
+    const res = await request(app.getHttpServer()).post('/persons').send({
       id: 0,
       name: 'nikita',
       age: 21,
