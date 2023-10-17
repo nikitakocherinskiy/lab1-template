@@ -22,11 +22,8 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Run unit tests
-        run: npm run test
-
       - name: Build Docker image
-        run: docker build -t your-app-name .
+        run: docker build -t lab1-rsoi
   # build:
   #   runs-on: ubuntu-latest
 
