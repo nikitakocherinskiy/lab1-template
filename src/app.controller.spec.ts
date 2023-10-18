@@ -3,15 +3,17 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PersonsModule } from './persons/persons.module';
 import { PersonsService } from './persons/persons.service';
+import { DatabaseModule } from './database/database.module';
+import { DatabaseService } from './database/database.service';
 
 describe('AppController', () => {
   let appController: AppController;
 
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
-      imports: [PersonsModule],
+      imports: [PersonsModule, DatabaseModule],
       controllers: [AppController],
-      providers: [AppService, PersonsService],
+      providers: [AppService, PersonsService, DatabaseService],
     }).compile();
 
     appController = app.get<AppController>(AppController);

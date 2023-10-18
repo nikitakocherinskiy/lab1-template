@@ -10,25 +10,24 @@ import {
   Post,
   UsePipes,
   ValidationPipe,
-  HttpCode,
+  Res,
   HttpStatus,
 } from '@nestjs/common';
 import { createPerson } from './dto/createPerson.dto';
 import { PersonsService } from './persons.service';
+import { Response } from 'express';
 
-@Controller('persons')
+@Controller('/api/v1/persons')
 export class PersonsController {
   constructor(private readonly personsService: PersonsService) {}
 
   @Get('/')
-  getPersons(): createPerson[] {
-    return this.personsService.getAllPersons();
+  async getPersons() {
+    this.personsService.getAllPersons();
   }
 
   @Get('/:personId')
-  getPersonById(
-    @Param('personId', ParseIntPipe) personId: number,
-  ): createPerson {
+  async getPersonById(@Param('personId', ParseIntPipe) personId: number) {
     if (personId === undefined) {
       throw new NotFoundException();
     }
@@ -37,21 +36,24 @@ export class PersonsController {
 
   @UsePipes(new ValidationPipe())
   @Post('/')
-  @HttpCode(HttpStatus.CREATED)
-  createPerson(@Body() dto: createPerson) {
-    this.personsService.createPerson(dto);
-    // res.location(`/api/v1/persons/${dto.name}`);
-    return dto;
+  async createPerson(@Body() dto: createPerson, @Res() res: Response) {
+    const newPerson = await this.personsService.createPerson(dto);
+    return res
+      .status(HttpStatus.CREATED)
+      .location(`/api/v1/persons/${newPerson.id}`)
+      .send();
   }
 
   @Patch('/:personId')
-  @UsePipes(new ValidationPipe())
-  updatePerson(@Body() dto: createPerson) {
-    this.personsService.updatePerson(dto);
+  async updatePerson(
+    @Body() dto: createPerson,
+    @Param('personId', ParseIntPipe) personId: number,
+  ) {
+    return this.personsService.updatePerson(dto, personId);
   }
 
   @Delete('/:personId')
-  deletePerson(@Param('personId', ParseIntPipe) personId: number) {
-    this.personsService.deletePerson(personId);
+  async deletePerson(@Param('personId', ParseIntPipe) personId: number) {
+    return this.personsService.deletePerson(personId);
   }
 }

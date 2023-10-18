@@ -1,49 +1,43 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { createPerson } from './dto/createPerson.dto';
+import { DatabaseService } from 'src/database/database.service';
 
 @Injectable()
 export class PersonsService {
-  private persons: createPerson[] = [];
+  constructor(private readonly databaseService: DatabaseService) {}
 
-  getAllPersons(): createPerson[] {
-    return this.persons;
+  async getAllPersons() {
+    return this.databaseService.person.findMany();
   }
 
-  getPerson(personId: number): createPerson {
-    const person = this.persons.find((p) => p.id === +personId);
+  async getPerson(personId: number) {
+    const person = await this.databaseService.person.findUnique({
+      where: { id: personId },
+    });
     if (!person) {
       throw new NotFoundException('Person not found');
     }
     return person;
   }
 
-  createPerson(dto: createPerson): createPerson {
-    const newPerson = new createPerson();
-    newPerson.id = dto.id;
-    newPerson.name = dto.name;
-    newPerson.age = dto.age;
-    newPerson.address = dto.address;
-    newPerson.work = dto.work;
-    this.persons.push(newPerson);
-    return newPerson;
+  async createPerson(dto: createPerson) {
+    return this.databaseService.person.create({ data: dto });
   }
 
-  updatePerson({ id, name, age, address, work }): void {
-    const index = this.persons.findIndex((p) => p.id === +id);
-    if (index === -1) {
-      throw new NotFoundException('Person not found');
-    }
-    this.persons[index].name = name;
-    this.persons[index].age = age;
-    this.persons[index].address = address;
-    this.persons[index].work = work;
+  async updatePerson(dto: createPerson, personId: number) {
+    return this.databaseService.person.update({
+      where: {
+        id: personId,
+      },
+      data: dto,
+    });
   }
 
-  deletePerson(personId: number): void {
-    const index = this.persons.findIndex((p) => p.id === +personId);
-    if (index === -1) {
-      throw new NotFoundException(`Person not found ${personId}`);
-    }
-    this.persons.splice(index, 1);
+  async deletePerson(personId: number) {
+    return this.databaseService.person.delete({
+      where: {
+        id: personId,
+      },
+    });
   }
 }

@@ -15,30 +15,27 @@ describe('Person API e2e tests', () => {
     await app.init();
   });
 
-  it('/persons (POST) - success', async () => {
-    const res = await request(app.getHttpServer()).post('/persons').send({
-      id: 1,
-      name: 'nikita',
-      age: 21,
-      address: 'box',
-      work: 'dev',
-    });
-    expect(res.body.id).toBeGreaterThan(0);
-    expect(res.body.name).toBe('nikita');
-    expect(res.body.age).toBe(21);
-    expect(res.body.address).toBe('box');
-    expect(res.body.work).toBe('dev');
+  it('/api/v1/persons (POST) - success', async () => {
+    const res = await request(app.getHttpServer())
+      .post('/api/v1/persons')
+      .send({
+        name: 'nikita',
+        age: 21,
+        address: 'box',
+        work: 'dev',
+      });
     expect(res.statusCode).toBe(201);
   });
 
-  it('/persons (POST) - fail', async () => {
-    const res = await request(app.getHttpServer()).post('/persons').send({
-      id: 0,
-      name: 'nikita',
-      age: 21,
-      address: 'box',
-      work: 'dev',
-    });
+  it('/api/v1/persons (POST) - fail', async () => {
+    const res = await request(app.getHttpServer())
+      .post('/api/v1/persons')
+      .send({
+        name: 'nikita',
+        age: '21',
+        address: 'box',
+        work: 'dev',
+      });
     expect(res.statusCode).toBe(400);
   });
 });

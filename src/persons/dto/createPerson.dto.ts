@@ -1,11 +1,7 @@
 /* eslint-disable prettier/prettier */
-import { IsNumber, IsString, Min } from 'class-validator';
+import { IsNumber, IsString } from 'class-validator';
 
 export class createPerson {
-  @Min(1)
-  @IsNumber()
-  id: number;
-  @IsString()
   name: string;
   @IsNumber()
   age: number;
