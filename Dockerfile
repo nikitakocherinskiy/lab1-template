@@ -1,11 +1,20 @@
-FROM node:14
+FROM node:18 as build
+WORKDIR /opt/app
+ARG DATABSE_URL
+ADD . .
+ADD package*.json ./
+RUN npm ci
+RUN echo DATABSE_URL=${DATABSE_URL} > .env
+RUN npx prisma generate
+RUN npm run build --prod
 
-WORKDIR /app
-
-COPY package*.json ./
-
-RUN npm install
-
-COPY . .
-
-CMD [ "npm", "run", "start" ]
+FROM node:18
+WORKDIR /opt/app
+ARG DATABSE_URL
+COPY --from=build /opt/app/dist ./dist
+ADD package*.json ./
+ADD ./prisma ./prisma
+RUN echo DATABSE_URL=${DATABSE_URL} > .env
+RUN npx prisma generate
+RUN npm ci --omit=dev
+CMD [ "node", "./dist/main.js" ]
