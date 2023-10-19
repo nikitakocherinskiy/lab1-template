@@ -8,8 +8,15 @@ on:
       - master
 jobs:
   test:
-    name: Autograding
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_USER: ${{ secrets.DB_POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.DB_POSTGRES_PASSWORD }}
+        ports:
+          - 5432:5432
     steps:
       - uses: actions/checkout@v3
         with:
@@ -22,6 +29,16 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: install psql
+        run: |
+          apt update -y 
+          apt install -y postgresql postgresql-contrib
+
+      - name: migrate_database
+        run: |
+          cd postgres
+          psql -h postgres "sslmode=disable user=${{ secrets.DB_POSTGRES_USER }} port=5432 password=${{ secrets.DB_POSTGRES_PASSWORD }}" < 10-create-user-and-db.sql
 
       - name: Run Unit Tests
         run: npm run test
