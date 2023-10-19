@@ -76,11 +76,4 @@ jobs:
         with:
           file: Dockerfile
           push: true
-          tags: user/app:latest
-  # deploy:
-  #   name: Deploy service Rebder
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #       with:
-  #         fetch-depth: 0
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/rsoi-lab1:latest
