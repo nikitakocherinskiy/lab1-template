@@ -11,12 +11,19 @@ jobs:
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres:latest
+        image: postgres
         env:
-          POSTGRES_USER: ${{ secrets.DB_POSTGRES_USER }}
-          POSTGRES_PASSWORD: ${{ secrets.DB_POSTGRES_PASSWORD }}
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
         ports:
           - 5432:5432
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/grading-app
     steps:
       - uses: actions/checkout@v3
         with:
@@ -29,16 +36,10 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
-
-      - name: install psql
-        run: |
-          apt update -y 
-          apt install -y postgresql postgresql-contrib
-
-      - name: migrate_database
-        run: |
-          cd postgres
-          psql -h postgres "sslmode=disable user=${{ secrets.DB_POSTGRES_USER }} port=5432 password=${{ secrets.DB_POSTGRES_PASSWORD }}" < 10-create-user-and-db.sql
+      - name: Build app
+        run: npm run build
+      - name: Database migration
+        run: npm run db:push
 
       - name: Run Unit Tests
         run: npm run test
