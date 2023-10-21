@@ -1,11 +1,11 @@
 FROM node:18 as build
 WORKDIR /opt/app
 ARG DATABSE_URL
-ADD package*.json ./
-ADD prisma ./prisma/
-ADD .env ./
-ADD tsconfig.json ./
-ADD . .
+COPY package*.json ./
+COPY prisma ./prisma/
+COPY .env ./
+COPY tsconfig.json ./
+COPY . .
 RUN npm ci
 RUN echo DATABSE_URL=${DATABSE_URL} > .env
 RUN npx prisma generate
@@ -16,10 +16,10 @@ FROM node:18
 WORKDIR /opt/app
 ARG DATABSE_URL
 COPY --from=build /opt/app/dist ./dist
-ADD package*.json ./
-ADD ./prisma ./prisma
-ADD .env ./
-ADD tsconfig.json ./
+COPY package*.json ./
+COPY ./prisma ./prisma
+COPY .env ./
+COPY tsconfig.json ./
 RUN echo DATABSE_URL=${DATABSE_URL} > .env
 RUN npx prisma generate
 RUN npm ci --omit=dev
