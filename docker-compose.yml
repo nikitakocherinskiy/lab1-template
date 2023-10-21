@@ -41,7 +41,7 @@ services:
     restart: always
 
 volumes:
-  db-data:
+  postgres-data:
   pgadmin-data:
   # postgres:
   #   image: library/postgres:13
