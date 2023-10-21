@@ -13,7 +13,7 @@ datasource db {
 model Person {
   id Int @default(autoincrement()) @id
   name String
-  age Int
-  address String
-  work String
+  age Int?
+  address String?
+  work String?
 }

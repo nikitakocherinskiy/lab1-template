@@ -8,52 +8,180 @@ import {
   ParseIntPipe,
   Patch,
   Post,
-  UsePipes,
-  ValidationPipe,
   Res,
   HttpStatus,
+  HttpException,
+  ValidationPipe,
+  UsePipes,
+  HttpCode,
 } from '@nestjs/common';
 import { createPerson } from './dto/createPerson.dto';
+import { PersonResponse } from 'src/models/personResponse';
 import { PersonsService } from './persons.service';
 import { Response } from 'express';
+import {
+  ApiBody,
+  ApiTags,
+  ApiResponse,
+  ApiOperation,
+  ApiParam,
+} from '@nestjs/swagger';
 
+@ApiTags('Person REST API operations')
 @Controller('/api/v1/persons')
 export class PersonsController {
   constructor(private readonly personsService: PersonsService) {}
-
   @Get('/')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'All Persons',
+    isArray: true,
+    type: PersonResponse,
+  })
+  @ApiOperation({
+    summary: 'Gets all persons',
+    operationId: 'listPersons',
+  })
   async getPersons() {
-    this.personsService.getAllPersons();
-  }
-
-  @Get('/:personId')
-  async getPersonById(@Param('personId', ParseIntPipe) personId: number) {
-    if (personId === undefined) {
-      throw new NotFoundException();
-    }
-    return this.personsService.getPerson(personId);
+    const persons = await this.personsService.getAllPersons();
+    return persons;
   }
 
   @UsePipes(new ValidationPipe())
   @Post('/')
+  @ApiOperation({
+    summary: 'Create new Person',
+    operationId: 'createPerson',
+  })
+  @ApiBody({ type: [createPerson] })
+  @ApiParam({
+    name: 'PersonRequest',
+    required: true,
+    description: 'Person description',
+  })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: 'Created new Person',
+    headers: {
+      location: {
+        description: 'Path to new Person',
+        style: 'simple',
+        schema: { type: 'string' },
+      },
+    },
+    type: createPerson,
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Invalid data',
+  })
   async createPerson(@Body() dto: createPerson, @Res() res: Response) {
-    const newPerson = await this.personsService.createPerson(dto);
-    return res
-      .status(HttpStatus.CREATED)
-      .location(`/api/v1/persons/${newPerson.id}`)
-      .send();
+    try {
+      const newPerson = await this.personsService.createPerson(dto);
+      res
+        .status(HttpStatus.CREATED)
+        .location(`/api/v1/persons/${newPerson.id}`)
+        .send('Created new Person');
+      return newPerson;
+    } catch (e) {
+      throw new HttpException(
+        {
+          status: HttpStatus.BAD_REQUEST,
+          error: 'Invalid data',
+        },
+        HttpStatus.BAD_REQUEST,
+        {
+          cause: e,
+        },
+      );
+    }
   }
 
-  @Patch('/:personId')
+  @ApiOperation({
+    summary: 'Get Person by ID',
+    operationId: 'getPerson',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Person for ID',
+    type: PersonResponse,
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Not found Person for ID',
+  })
+  @Get('/:id')
+  async getPersonById(
+    @Param('id', ParseIntPipe) personId: number,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    try {
+      res.status(HttpStatus.OK);
+      return this.personsService.getPerson(personId);
+    } catch (e) {
+      throw new NotFoundException();
+    }
+  }
+
+  @ApiOperation({
+    summary: 'Remove Person by ID',
+    operationId: 'editPerson_1',
+  })
+  @ApiBody({ type: [createPerson] })
+  @ApiParam({
+    name: 'PersonRequest',
+    required: true,
+    description: 'Person description',
+    schema: {
+      type: 'createPerson',
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.NO_CONTENT,
+    description: 'Person for ID was remove',
+  })
+  @Delete('/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deletePerson(@Param('id', ParseIntPipe) personId: number) {
+    return this.personsService.deletePerson(personId);
+  }
+
+  @ApiOperation({
+    summary: 'Update Person by ID',
+    operationId: 'editPerson',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Person for ID was updated',
+    type: PersonResponse,
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Invalid data',
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Not found Person for ID',
+  })
+  @UsePipes(new ValidationPipe())
+  @Patch('/:id')
   async updatePerson(
     @Body() dto: createPerson,
-    @Param('personId', ParseIntPipe) personId: number,
+    @Param('id', ParseIntPipe) personId: number,
   ) {
-    return this.personsService.updatePerson(dto, personId);
-  }
-
-  @Delete('/:personId')
-  async deletePerson(@Param('personId', ParseIntPipe) personId: number) {
-    return this.personsService.deletePerson(personId);
+    try {
+      return await this.personsService.updatePerson(dto, personId);
+    } catch (e) {
+      throw new HttpException(
+        {
+          status: HttpStatus.NOT_FOUND,
+          error: 'Not found Person for ID',
+        },
+        HttpStatus.NOT_FOUND,
+        {
+          cause: e,
+        },
+      );
+    }
   }
 }
