@@ -31,57 +31,35 @@
 # CMD [ "node", "dist/main.js" ]
 
 # ---------------------------
-# FROM node:18
-# WORKDIR /app
-# COPY package*.json ./
-# COPY prisma ./prisma/
-# COPY .env ./
-# COPY tsconfig.json ./
-# COPY . .
-# RUN npm ci
-# RUN npx prisma generate
-# EXPOSE 8080
-# CMD [  "npm", "run", "start:migrate:start" ]
-
-FROM node:18-alpine AS builder
+FROM node:18
 WORKDIR /app
-COPY package*.json /app/
-RUN npm ci
+COPY package*.json ./
+COPY prisma ./prisma/
+COPY .env ./
+COPY tsconfig.json ./
 COPY . .
-ENV NODE_BUILD=true
-RUN npm run build
-CMD node build
-
-FROM node:18-alpine as production
-COPY --from=builder ./build .
-ENV NODE_ENV=production
+RUN npm ci
+RUN npx prisma generate
 EXPOSE 8080
-CMD node ./build
+CMD [  "npm", "run", "start:migrate:start" ]
 
 # FROM node:18 as build
 # WORKDIR /opt/app
-# ARG DATABSE_URL
 # COPY package*.json ./
 # COPY prisma ./prisma/
 # COPY .env ./
 # COPY tsconfig.json ./
-# COPY . .
 # RUN npm ci
-# RUN echo DATABSE_URL=${DATABSE_URL} > .env
 # RUN npx prisma generate
-# RUN npx prisma migrate dev
+# COPY . .
 # RUN npm run build --prod
 
 # FROM node:18
 # WORKDIR /opt/app
-# ARG DATABSE_URL
 # COPY --from=build /opt/app/dist ./dist
 # COPY package*.json ./
-# COPY ./prisma ./prisma
-# COPY .env ./
-# COPY tsconfig.json ./
-# RUN echo DATABSE_URL=${DATABSE_URL} > .env
-# RUN npx prisma generate
+# COPY .env ./dist
+# # COPY tsconfig.json ./
 # RUN npm ci --omit=dev
-# RUN prisma migrate deploy
+# RUN npx prisma generate
 # CMD [ "node", "./dist/main.js" ]
