@@ -35,7 +35,6 @@ COPY tsconfig.json ./
 COPY . .
 RUN npm install
 RUN npx prisma generate
-RUN npx prisma migrate:start
 EXPOSE 8080
 CMD [  "npm", "run", "start:migrate:start" ]
 
