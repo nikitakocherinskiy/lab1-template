@@ -26,7 +26,7 @@
 # RUN prisma migrate deploy
 # CMD [ "node", "./dist/main.js" ]
 
-FROM node:alpine
+FROM node:18
 WORKDIR /app
 COPY package*.json ./
 COPY prisma ./prisma/
