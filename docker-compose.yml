@@ -1,19 +1,18 @@
 version: '3'
 services:
   postgres:
-    image: library/postgres:13
+    image: postgres:latest
     container_name: postgres
     hostname: postgres
-    restart: unless-stopped
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=persons
-    volumes:
-      - db-data:/var/lib/postgresql/data
-      - ./postgres/:/docker-entrypoint-initdb.d/
     ports:
-      - '5432:5432'
+      - 5432:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: Persons
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    restart: unless-stopped
 
   pgadmin:
     image: dpage/pgadmin4
@@ -28,20 +27,6 @@ services:
     volumes:
       - pgadmin-data:/var/lib/pgadmin
     restart: unless-stopped
-
-  # main:
-  #   container_name: main
-  #   build:
-  #     context: .
-  #   volumes:
-  #     - .:/opt/app
-  #     - /opt/app/node_modules
-  #   ports:
-  #     - 8080:8080
-  #   command: npm run start
-  #   depends_on:
-  #     - postgres
-  #   restart: always
 
   main:
     stdin_open: true
@@ -58,3 +43,45 @@ services:
 volumes:
   db-data:
   pgadmin-data:
+  # postgres:
+  #   image: library/postgres:13
+  #   container_name: postgres
+  #   hostname: postgres
+  #   restart: unless-stopped
+  #   environment:
+  #     - POSTGRES_USER=postgres
+  #     - POSTGRES_PASSWORD=password
+  #     - POSTGRES_DB=persons
+  #   volumes:
+  #     - db-data:/var/lib/postgresql/data
+  #     - ./postgres/:/docker-entrypoint-initdb.d/
+  #   ports:
+  #     - '5432:5432'
+
+  # pgadmin:
+  #   image: dpage/pgadmin4
+  #   container_name: pgadmin
+  #   depends_on:
+  #     - postgres
+  #   ports:
+  #     - '5555:80'
+  #   environment:
+  #     PGADMIN_DEFAULT_EMAIL: pgadmin4@pgadmin.org
+  #     PGADMIN_DEFAULT_PASSWORD: admin
+  #   volumes:
+  #     - pgadmin-data:/var/lib/pgadmin
+  #   restart: unless-stopped
+
+  # main:
+  #   container_name: main
+  #   build:
+  #     context: .
+  #   volumes:
+  #     - .:/opt/app
+  #     - /opt/app/node_modules
+  #   ports:
+  #     - 8080:8080
+  #   command: npm run start
+  #   depends_on:
+  #     - postgres
+  #   restart: always
