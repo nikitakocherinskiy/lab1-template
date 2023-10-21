@@ -40,6 +40,7 @@ COPY tsconfig.json ./
 COPY . .
 RUN npm ci
 RUN npx prisma generate
+RUN npm run db:push
 EXPOSE 8080
 CMD [  "npm", "run", "start:migrate:start" ]
 
