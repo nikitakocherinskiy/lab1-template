@@ -30,18 +30,33 @@
 # COPY --chown=node:node .env ./
 # CMD [ "node", "dist/main.js" ]
 
-FROM node:18
-WORKDIR /app
-COPY package*.json ./
-COPY prisma ./prisma/
-COPY .env ./
-COPY tsconfig.json ./
-COPY . .
-RUN npm install
-RUN npx prisma generate
-EXPOSE 8080
-CMD [  "npm", "run", "start:migrate:start" ]
+# ---------------------------
+# FROM node:18
+# WORKDIR /app
+# COPY package*.json ./
+# COPY prisma ./prisma/
+# COPY .env ./
+# COPY tsconfig.json ./
+# COPY . .
+# RUN npm ci
+# RUN npx prisma generate
+# EXPOSE 8080
+# CMD [  "npm", "run", "start:migrate:start" ]
 
+FROM node:18-alpine AS builder
+WORKDIR /app
+COPY package*.json /app/
+RUN npm ci
+COPY . .
+ENV NODE_BUILD=true
+RUN npm run build
+CMD node build
+
+FROM node:18-alpine as production
+COPY --from=builder ./build .
+ENV NODE_ENV=production
+EXPOSE 8080
+CMD node ./build
 
 # FROM node:18 as build
 # WORKDIR /opt/app
