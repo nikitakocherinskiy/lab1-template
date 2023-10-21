@@ -1,86 +1,85 @@
-version: '3'
+# version: '3'
+# services:
+#   postgres:
+#     image: postgres:latest
+#     container_name: postgres
+#     ports:
+#       - 5432:5432
+#     environment:
+#       POSTGRES_USER: postgres
+#       POSTGRES_PASSWORD: password
+#       POSTGRES_DB: Persons
+#     volumes:
+#       - postgres-data:/var/lib/postgresql/data
+#     restart: unless-stopped
+
+#   pgadmin:
+#     image: dpage/pgadmin4
+#     container_name: pgadmin
+#     depends_on:
+#       - postgres
+#     ports:
+#       - '5555:80'
+#     environment:
+#       PGADMIN_DEFAULT_EMAIL: pgadmin4@pgadmin.org
+#       PGADMIN_DEFAULT_PASSWORD: admin
+#     volumes:
+#       - pgadmin-data:/var/lib/pgadmin
+#     restart: unless-stopped
+
+#   main:
+#     stdin_open: true
+#     build:
+#       context: .
+#       dockerfile: Dockerfile
+#     container_name: prisma-postgres-api
+#     depends_on:
+#       - postgres
+#     ports:
+#       - '8080:8080'
+#     restart: always
+
+# volumes:
+#   postgres-data:
+#   pgadmin-data:
+version: '3.8'
 services:
   postgres:
-    image: postgres:latest
-    container_name: postgres
+    image: postgres:15.3-alpine
+    restart: always
     ports:
       - 5432:5432
+    env_file:
+      - .env
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: Persons
+      # You'll notice the DATABASE_URL variable in the docker-compose.yml file is the same as the DATABASE_URL variable in the .env file - except the host has been updated to postgres instead of localhost.
+      # This will prevent you from getting the error: Error: Can't reach database server at localhost:5432
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT}/${POSTGRES_DB}?schema=${POSTGRES_SCHEMA}
     volumes:
-      - postgres-data:/var/lib/postgresql/data
-    restart: unless-stopped
-
-  pgadmin:
-    image: dpage/pgadmin4
-    container_name: pgadmin
-    depends_on:
-      - postgres
-    ports:
-      - '5555:80'
-    environment:
-      PGADMIN_DEFAULT_EMAIL: pgadmin4@pgadmin.org
-      PGADMIN_DEFAULT_PASSWORD: admin
-    volumes:
-      - pgadmin-data:/var/lib/pgadmin
-    restart: unless-stopped
-
-  main:
-    stdin_open: true
+      - postgres:/var/lib/postgresql/data
+    networks:
+      - nestjs
+  api:
     build:
-      context: .
       dockerfile: Dockerfile
-    container_name: prisma-postgres-api
+      context: .
+      # Only will build development stage from our dockerfile
+      target: development
+    volumes:
+      - .:/usr/src/app
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:${POSTGRES_PORT}/${POSTGRES_DB}?schema=${POSTGRES_SCHEMA}
+    # Run a command against the development stage of the image
+    command: npm run start:dev
+    ports:
+      - 3000:3000
     depends_on:
       - postgres
-    ports:
-      - '8080:8080'
-    restart: always
-
 volumes:
-  postgres-data:
-  pgadmin-data:
-  # postgres:
-  #   image: library/postgres:13
-  #   container_name: postgres
-  #   hostname: postgres
-  #   restart: unless-stopped
-  #   environment:
-  #     - POSTGRES_USER=postgres
-  #     - POSTGRES_PASSWORD=password
-  #     - POSTGRES_DB=persons
-  #   volumes:
-  #     - db-data:/var/lib/postgresql/data
-  #     - ./postgres/:/docker-entrypoint-initdb.d/
-  #   ports:
-  #     - '5432:5432'
+  postgres:
+    name: nestjs-postgres
 
-  # pgadmin:
-  #   image: dpage/pgadmin4
-  #   container_name: pgadmin
-  #   depends_on:
-  #     - postgres
-  #   ports:
-  #     - '5555:80'
-  #   environment:
-  #     PGADMIN_DEFAULT_EMAIL: pgadmin4@pgadmin.org
-  #     PGADMIN_DEFAULT_PASSWORD: admin
-  #   volumes:
-  #     - pgadmin-data:/var/lib/pgadmin
-  #   restart: unless-stopped
-
-  # main:
-  #   container_name: main
-  #   build:
-  #     context: .
-  #   volumes:
-  #     - .:/opt/app
-  #     - /opt/app/node_modules
-  #   ports:
-  #     - 8080:8080
-  #   command: npm run start
-  #   depends_on:
-  #     - postgres
-  #   restart: always
+networks:
+  nestjs:
