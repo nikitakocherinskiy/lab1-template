@@ -1,22 +1,10 @@
 version: '3'
 services:
-  main:
-    container_name: main
-    build:
-      context: .
-    volumes:
-      - .:/opt/app
-      - /opt/app/node_modules
-    ports:
-      - 8080:8080
-    command: npm run start
-    depends_on:
-      - postgres
-    restart: always
   postgres:
     image: library/postgres:13
     container_name: postgres
-    restart: on-failure
+    hostname: postgres
+    restart: unless-stopped
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=password
@@ -27,5 +15,46 @@ services:
     ports:
       - '5432:5432'
 
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    depends_on:
+      - postgres
+    ports:
+      - '5555:80'
+    environment:
+      PGADMIN_DEFAULT_EMAIL: pgadmin4@pgadmin.org
+      PGADMIN_DEFAULT_PASSWORD: admin
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    restart: unless-stopped
+
+  # main:
+  #   container_name: main
+  #   build:
+  #     context: .
+  #   volumes:
+  #     - .:/opt/app
+  #     - /opt/app/node_modules
+  #   ports:
+  #     - 8080:8080
+  #   command: npm run start
+  #   depends_on:
+  #     - postgres
+  #   restart: always
+
+  main:
+    stdin_open: true
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: prisma-postgres-api
+    depends_on:
+      - postgres
+    ports:
+      - '8080:8080'
+    restart: always
+
 volumes:
   db-data:
+  pgadmin-data:
