@@ -40,9 +40,9 @@ COPY tsconfig.json ./
 COPY . .
 RUN npm ci
 RUN npx prisma generate
-RUN npm run db:push
+RUN npm run start:migrate
 EXPOSE 8080
-CMD [  "npm", "run", "start:migrate:start" ]
+CMD [  "npm", "run", "start" ]
 
 # FROM node:18 as build
 # WORKDIR /opt/app
