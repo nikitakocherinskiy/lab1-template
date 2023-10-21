@@ -39,7 +39,8 @@ COPY .env ./
 COPY tsconfig.json ./
 COPY . .
 RUN npm ci
-RUN npx prisma generate
+# RUN npx prisma generate
+RUN npm run prestart:dev
 EXPOSE 8080
 CMD [  "npm", "run", "start:migrate:start" ]
 #----------------------------
