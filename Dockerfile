@@ -2,9 +2,12 @@ FROM node:18-alpine As development
 WORKDIR /usr/src/app
 COPY --chown=node:node package*.json ./
 RUN npm ci
+COPY --chown=node:node prisma ./prisma/
+COPY --chown=node:node .env ./
+COPY --chown=node:node tsconfig.json ./
 COPY --chown=node:node . .
 RUN npx prisma generate
-EXPOSE 3000
+EXPOSE 8080
 USER node
 
 
@@ -12,6 +15,9 @@ FROM node:18-alpine As build
 WORKDIR /usr/src/app
 COPY --chown=node:node package*.json ./
 COPY --chown=node:node --from=development /usr/src/app/node_modules ./node_modules
+COPY --chown=node:node prisma ./prisma/
+COPY --chown=node:node .env ./
+COPY --chown=node:node tsconfig.json ./
 COPY --chown=node:node . .
 RUN npm run build
 ENV NODE_ENV production
