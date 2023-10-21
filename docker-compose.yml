@@ -24,6 +24,8 @@ services:
       interval: 1s
       timeout: 3s
       retries: 30
+    networks:
+      - mynetwork
 
   pgadmin:
     image: dpage/pgadmin4
@@ -38,6 +40,8 @@ services:
     volumes:
       - pgadmin-data:/var/lib/pgadmin
     restart: unless-stopped
+    networks:
+      - mynetwork
 
   main:
     stdin_open: true
@@ -47,22 +51,16 @@ services:
     container_name: prisma-postgres-api
     depends_on:
       - postgres
-    command:
-      [
-        './wait-for-it.sh',
-        'postgres:5432',
-        '--',
-        'npm',
-        'run',
-        'start:migrate:start',
-      ]
     ports:
       - '8080:8080'
     restart: always
-
+    networks:
+      - mynetwork
 volumes:
   postgres-data:
   pgadmin-data:
+networks:
+  mynetwork:
 # version: '3.8'
 # services:
 #   postgres:
