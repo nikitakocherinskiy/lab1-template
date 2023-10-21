@@ -47,6 +47,15 @@ services:
     container_name: prisma-postgres-api
     depends_on:
       - postgres
+    command:
+      [
+        './wait-for-it.sh',
+        'postgres:5432',
+        '--',
+        'npm',
+        'run',
+        'start:migrate:start',
+      ]
     ports:
       - '8080:8080'
     restart: always

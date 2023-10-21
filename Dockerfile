@@ -31,30 +31,18 @@
 # CMD [ "node", "dist/main.js" ]
 
 # ---------------------------
-# FROM node:18
-# WORKDIR /app
-# COPY package*.json ./
-# COPY prisma ./prisma/
-# COPY .env ./
-# COPY tsconfig.json ./
-# COPY . .
-# RUN npm ci
-# RUN npx prisma generate
-# EXPOSE 8080
-# CMD [  "npm", "run", "start:migrate:start" ]
-#----------------------------
 FROM node:18
 WORKDIR /app
 COPY package*.json ./
 COPY prisma ./prisma/
 COPY .env ./
 COPY tsconfig.json ./
+COPY . .
 RUN npm ci
 RUN npx prisma generate
-COPY . .
-RUN npm run build
-RUN npm run db:push
+EXPOSE 8080
 CMD [  "npm", "run", "start:migrate:start" ]
+#----------------------------
 
 # FROM node:18 as build
 # WORKDIR /opt/app
