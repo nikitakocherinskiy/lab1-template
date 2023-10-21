@@ -1,80 +1,81 @@
-# version: '3'
-# services:
-#   postgres:
-#     image: postgres:latest
-#     container_name: postgres
-#     ports:
-#       - 5432:5432
-#     environment:
-#       POSTGRES_USER: postgres
-#       POSTGRES_PASSWORD: password
-#       POSTGRES_DB: Persons
-#     volumes:
-#       - postgres-data:/var/lib/postgresql/data
-#     restart: unless-stopped
-
-#   pgadmin:
-#     image: dpage/pgadmin4
-#     container_name: pgadmin
-#     depends_on:
-#       - postgres
-#     ports:
-#       - '5555:80'
-#     environment:
-#       PGADMIN_DEFAULT_EMAIL: pgadmin4@pgadmin.org
-#       PGADMIN_DEFAULT_PASSWORD: admin
-#     volumes:
-#       - pgadmin-data:/var/lib/pgadmin
-#     restart: unless-stopped
-
-#   main:
-#     stdin_open: true
-#     build:
-#       context: .
-#       dockerfile: Dockerfile
-#     container_name: prisma-postgres-api
-#     depends_on:
-#       - postgres
-#     ports:
-#       - '8080:8080'
-#     restart: always
-
-# volumes:
-#   postgres-data:
-#   pgadmin-data:
-version: '3.8'
+version: '3'
 services:
   postgres:
+    image: postgres:latest
     container_name: postgres
-    image: postgres:15.3-alpine
-    restart: always
     ports:
       - 5432:5432
-    env_file:
-      - .env
     environment:
-      DATABASE_URL: ${DATABASE_URL}
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: Persons
     volumes:
-      - postgres:/var/lib/postgresql/data
-    networks:
-      - nestjs
-  api:
-    build:
-      dockerfile: Dockerfile
-      context: .
-      target: development
-    volumes:
-      - .:/usr/src/app
-    environment:
-      DATABASE_URL: ${DATABASE_URL}
-    command: npm run start:dev
-    ports:
-      - 8080:8080
+      - postgres-data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
     depends_on:
       - postgres
-volumes:
-  postgres:
-    name: nestjs-postgres
+    ports:
+      - '5555:80'
+    environment:
+      PGADMIN_DEFAULT_EMAIL: pgadmin4@pgadmin.org
+      PGADMIN_DEFAULT_PASSWORD: admin
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    restart: unless-stopped
 
-networks:
-  nestjs:
+  main:
+    stdin_open: true
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: prisma-postgres-api
+    depends_on:
+      - postgres
+    ports:
+      - '8080:8080'
+    restart: always
+
+volumes:
+  postgres-data:
+  pgadmin-data:
+
+# version: '3.8'
+# services:
+#   postgres:
+#     container_name: postgres
+#     image: postgres:15.3-alpine
+#     restart: always
+#     ports:
+#       - 5432:5432
+#     env_file:
+#       - .env
+#     environment:
+#       DATABASE_URL: ${DATABASE_URL}
+#     volumes:
+#       - postgres:/var/lib/postgresql/data
+#     networks:
+#       - nestjs
+#   api:
+#     build:
+#       dockerfile: Dockerfile
+#       context: .
+#       target: development
+#     volumes:
+#       - .:/usr/src/app
+#     environment:
+#       DATABASE_URL: ${DATABASE_URL}
+#     command: npm run start:dev
+#     ports:
+#       - 8080:8080
+#     depends_on:
+#       - postgres
+# volumes:
+#   postgres:
+#     name: nestjs-postgres
+
+# networks:
+#   nestjs:
