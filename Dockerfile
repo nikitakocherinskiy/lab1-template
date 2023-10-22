@@ -23,12 +23,14 @@
 # ---------------------------
 FROM node:18
 WORKDIR /app
+ENV DATABASE_URL postgresql://postgres:postgres@postgres:5432/persons?schema=public
 COPY package*.json ./
 COPY prisma ./prisma/
 COPY .env ./
 COPY tsconfig.json ./
 COPY . .
 RUN npm ci
+RUN npx prisma migrate deploy
 RUN npx prisma generate
 # RUN npm run prestart:dev
 EXPOSE 8080
