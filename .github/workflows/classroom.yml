@@ -113,6 +113,10 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Sleep for 3 minutes
+        run: sleep 180s
+        shell: bash
+
       - name: Run API Tests
         uses: matt-ball/newman-action@master
         with:
