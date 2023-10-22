@@ -49,6 +49,7 @@ services:
       DATABASE_URL: ${DATABASE_URL}
       NODE_ENV: production
       PORT: 8080
+    command: echo ${DATABASE_URL}
     restart: always
     networks:
       - service
