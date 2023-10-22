@@ -19,7 +19,7 @@ COPY --chown=node:node --from=build /usr/src/app/node_modules/.prisma/client  ./
 
 ENV NODE_ENV production
 EXPOSE 8080
-CMD ["dumb-init", "node", "dist/src/main.js"]
+CMD ["dumb-init", "node", "dist/main.js"]
 
 # ---------------------------
 # FROM node:18
