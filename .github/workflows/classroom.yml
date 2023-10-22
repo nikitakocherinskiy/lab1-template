@@ -50,7 +50,6 @@ jobs:
         run: npm run test:e2e
 
   deploy:
-    name: Deploy Persons service on remote VM
     needs: [test]
     runs-on: ubuntu-latest
     steps:
@@ -106,14 +105,18 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/rsoi-lab1:latest
 
-  int-test:
-    needs: [deploy, build]
+  api-test:
+    needs: [deploy]
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: Run API Tests
         uses: matt-ball/newman-action@master
         with:
           collection: postman/[inst] Lab1.postman_collection.json
           environment: postman/[inst][heroku] Lab1.postman_environment.json
-          delayRequest: 100
+          delayRequest: 15
           reporters: '[ "cli" ]'
