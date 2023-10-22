@@ -42,11 +42,11 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    # volumes:
-    #   - .:/usr/src/app
-    #   - /usr/src/app/node_modules
+    volumes:
+      - .:/app
+      - /app/node_modules
     environment:
-      DATABASE_URL: 'postgresql://postgres:postgres@postgres:5432/persons?schema=public'
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/persons?schema=public
       NODE_ENV: production
       PORT: 8080
     restart: always
