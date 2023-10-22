@@ -82,13 +82,7 @@ jobs:
             echo ${{ secrets.SSH_PASSWORD }} | sudo -S docker-compose down
             echo ${{ secrets.SSH_PASSWORD }} | sudo -S docker rmi person_service
             echo ${{ secrets.SSH_PASSWORD }} | sudo -S docker-compose up -d
-      - name: Run API Tests
-        uses: matt-ball/newman-action@master
-        with:
-          collection: postman/[inst] Lab1.postman_collection.json
-          environment: postman/[inst][heroku] Lab1.postman_environment.json
-          delayRequest: 100
-          reporters: '[ "cli" ]'
+
   build:
     needs: [test]
     runs-on: ubuntu-latest
@@ -111,3 +105,15 @@ jobs:
           file: Dockerfile
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/rsoi-lab1:latest
+
+  int-test:
+    needs: [deploy, build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run API Tests
+        uses: matt-ball/newman-action@master
+        with:
+          collection: postman/[inst] Lab1.postman_collection.json
+          environment: postman/[inst][heroku] Lab1.postman_environment.json
+          delayRequest: 100
+          reporters: '[ "cli" ]'
