@@ -16,12 +16,14 @@ services:
     image: postgres:latest
     container_name: postgres
     restart: always
-    ports:
-      - '5432:5432'
+    env_file:
+      - .env
     environment:
-      POSTGRES_USER: ${PGUSER}
-      POSTGRES_PASSWORD: ${PGPASSWORD}
-      POSTGRES_DB: ${PGDATABASE}
+      PG_DATA: /var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres-data: /var/lib/postgresql/data
     networks:
       - service
     healthcheck:
@@ -38,17 +40,15 @@ services:
       - postgres
     container_name: prisma-postgres-api
     ports:
-      - '8080:8080'
+      - 8080:8080
     build:
       context: .
       dockerfile: Dockerfile
     volumes:
       - .:/app
       - /app/node_modules
-    environment:
-      DATABASE_URL: ${DATABASE_URL}
-      NODE_ENV: production
-      PORT: 8080
+    env_file:
+      - .env
     restart: always
     networks:
       - service

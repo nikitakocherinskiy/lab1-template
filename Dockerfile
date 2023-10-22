@@ -21,19 +21,33 @@
 # CMD ["node", "dist/main"]
 
 # ---------------------------
+# FROM node:18
+# WORKDIR /app
+# COPY package*.json ./
+# COPY prisma ./prisma/
+# COPY .env ./
+# COPY tsconfig.json ./
+# COPY . .
+# RUN npm ci
+# RUN npx prisma generate
+# # RUN npm run prestart:dev
+# EXPOSE 8080
+# CMD [  "npm", "run", "start" ]
+#----------------------------
+
 FROM node:18
 WORKDIR /app
 COPY package*.json ./
 COPY prisma ./prisma/
 COPY .env ./
 COPY tsconfig.json ./
-COPY . .
 RUN npm ci
 RUN npx prisma generate
+COPY . .
+COPY ./dist ./dist
 # RUN npm run prestart:dev
 EXPOSE 8080
-CMD [  "npm", "run", "start" ]
-#----------------------------
+CMD [  "npm", "run", "start:dev" ]
 
 # FROM node:18 as build
 # WORKDIR /opt/app
