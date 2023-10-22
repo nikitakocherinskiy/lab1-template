@@ -46,10 +46,9 @@ services:
     #   - .:/usr/src/app
     #   - /usr/src/app/node_modules
     environment:
-      DATABASE_URL: ${DATABASE_URL}
+      DATABASE_URL: 'postgresql://postgres:postgres@postgres:5432/persons?schema=public'
       NODE_ENV: production
       PORT: 8080
-    command: echo ${DATABASE_URL}
     restart: always
     networks:
       - service
