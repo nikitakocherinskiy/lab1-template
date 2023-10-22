@@ -1,48 +1,39 @@
-# FROM node:18-alpine As development
-# WORKDIR /usr/src/app
-# COPY --chown=node:node package*.json ./
-# RUN npm ci
-# COPY --chown=node:node prisma ./prisma/
-# COPY --chown=node:node .env ./
-# COPY --chown=node:node tsconfig.json ./
-# COPY --chown=node:node . .
-# RUN npx prisma generate
-# EXPOSE 8080
-# USER node
+FROM node:18 as build
+WORKDIR /usr/src/app
+COPY package.json .
+COPY package-lock.json .
+RUN npm install
+COPY . .
+RUN npx prisma generate
+RUN npm run build
 
+FROM node:18-slim
+RUN apt update && apt install libssl-dev dumb-init -y --no-install-recommends
+WORKDIR /usr/src/app
+COPY --chown=node:node --from=build /usr/src/app/dist ./dist
+COPY --chown=node:node --from=build /usr/src/app/.env .env
+COPY --chown=node:node --from=build /usr/src/app/package.json .
+COPY --chown=node:node --from=build /usr/src/app/package-lock.json .
+RUN npm install --omit=dev
+COPY --chown=node:node --from=build /usr/src/app/node_modules/.prisma/client  ./node_modules/.prisma/client
 
-# FROM node:18-alpine As build
-# WORKDIR /usr/src/app
-# COPY --chown=node:node package*.json ./
-# COPY --chown=node:node --from=development /usr/src/app/node_modules ./node_modules
-# COPY --chown=node:node prisma ./prisma/
-# COPY --chown=node:node .env ./
-# COPY --chown=node:node tsconfig.json ./
-# COPY --chown=node:node . .
-# RUN npm run build
-# ENV NODE_ENV production
-# RUN npm ci --only=production && npm cache clean --force
-# USER node
-
-# FROM node:18-alpine As production
-# COPY --chown=node:node --from=build /usr/src/app/node_modules ./node_modules
-# COPY --chown=node:node --from=build /usr/src/app/dist ./dist
-# COPY --chown=node:node .env ./
-# CMD [ "node", "dist/main.js" ]
+ENV NODE_ENV production
+EXPOSE 8080
+CMD ["dumb-init", "node", "dist/src/main"]
 
 # ---------------------------
-FROM node:18
-WORKDIR /app
-COPY package*.json ./
-COPY prisma ./prisma/
-COPY .env ./
-COPY tsconfig.json ./
-COPY . .
-RUN npm ci
-RUN npx prisma generate
-# RUN npm run prestart:dev
-EXPOSE 8080
-CMD [  "npm", "run", "start:migrate:start" ]
+# FROM node:18
+# WORKDIR /app
+# COPY package*.json ./
+# COPY prisma ./prisma/
+# COPY .env ./
+# COPY tsconfig.json ./
+# COPY . .
+# RUN npm ci
+# RUN npx prisma generate
+# # RUN npm run prestart:dev
+# EXPOSE 8080
+# CMD [  "npm", "run", "start:migrate:start" ]
 #----------------------------
 
 # FROM node:18 as build
