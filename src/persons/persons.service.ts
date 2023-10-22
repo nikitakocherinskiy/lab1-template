@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { createPerson } from './dto/createPerson.dto';
 import { DatabaseService } from 'src/database/database.service';
-import { validate, validateOrReject } from 'class-validator';
+import { validate } from 'class-validator';
 
 @Injectable()
 export class PersonsService {

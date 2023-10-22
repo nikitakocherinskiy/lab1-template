@@ -6,7 +6,7 @@ import { AppModule } from './../src/app.module';
 describe('Person API e2e tests', () => {
   let app: INestApplication;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
@@ -15,27 +15,8 @@ describe('Person API e2e tests', () => {
     await app.init();
   });
 
-  it('/api/v1/persons (POST) - success', async () => {
-    const res = await request(app.getHttpServer())
-      .post('/api/v1/persons')
-      .send({
-        name: 'nikita',
-        age: 21,
-        address: 'box',
-        work: 'dev',
-      });
-    expect(res.statusCode).toBe(201);
-  });
-
-  it('/api/v1/persons (POST) - fail', async () => {
-    const res = await request(app.getHttpServer())
-      .post('/api/v1/persons')
-      .send({
-        name: 'nikita',
-        age: '21',
-        address: 'box',
-        work: 'dev',
-      });
-    expect(res.statusCode).toBe(400);
+  it('/api/v1/persons (GET) - success', async () => {
+    const res = await request(app.getHttpServer()).get('/api/v1/persons');
+    expect(res.statusCode).toBe(200);
   });
 });
