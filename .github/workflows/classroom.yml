@@ -49,14 +49,39 @@ jobs:
       - name: Run E2E Tests
         run: npm run test:e2e
 
-      # - name: Deploy on Render
-      #   uses: ashishkujoy/render-deploy@v1.0.5
-      #   with:
-      #     service-id: ${{ secrets.SERVICE_ID }}
-      #     service-key: ${{ secrets.SERVICE_KEY }}
-      #     api-key: ${{ secrets.API_KEY }}
-      #     max-deployment-wait-ms: 360000
-      #     delay-in-ms: 10000
+  deploy:
+    name: Deploy Persons service on remote VM
+    needs: [test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Send project files on VM
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          passphrase: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          source: 'src,prisma,Dockerfile,docker-compose.yml,package.json,.env'
+          target: /home/${{ secrets.SSH_USER }}/person_service
+
+      - name: Build and up person-service
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          passphrase: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            cd /home/${{ secrets.SSH_USER }}/person_service
+            echo ${{ secrets.SSH_PASSWORD }} | sudo -S docker-compose down
+            echo ${{ secrets.SSH_PASSWORD }} | sudo -S docker rmi person_service
+            echo ${{ secrets.SSH_PASSWORD }} | sudo -S docker-compose up -d
       # - name: Run API Tests
       #   uses: matt-ball/newman-action@master
       #   with:
