@@ -13,40 +13,24 @@ services:
   #   - postgres-data:/var/lib/postgresql/data
   #   restart: unless-stopped
   postgres:
-    image: postgres:15
+    image: postgres:latest
     container_name: postgres
     restart: always
     ports:
-      - 5432:5432
+      - '5432:5432'
     environment:
-      POSTGRES_PASSWORD: password
       POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
       POSTGRES_DB: persons
     volumes:
       - postgres-data:/var/lib/postgresql/data
+    networks:
+      - database
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB']
       interval: 1s
       timeout: 3s
       retries: 30
-    networks:
-      - mynetwork
-
-  pgadmin:
-    image: dpage/pgadmin4
-    container_name: pgadmin
-    depends_on:
-      - postgres
-    ports:
-      - 5555:80
-    environment:
-      PGADMIN_DEFAULT_EMAIL: pgadmin4@pgadmin.org
-      PGADMIN_DEFAULT_PASSWORD: admin
-    volumes:
-      - pgadmin-data:/var/lib/pgadmin
-    restart: unless-stopped
-    networks:
-      - mynetwork
 
   main:
     stdin_open: true
@@ -57,19 +41,22 @@ services:
     depends_on:
       - postgres
     ports:
-      - 8080:8080
+      - '8080:8080'
     env_file:
       - .env
     restart: always
     networks:
-      - mynetwork
+      - service
+      - database
 
 volumes:
   postgres-data:
-  pgadmin-data:
 
 networks:
-  mynetwork:
+  service:
+    driver: bridge
+  database:
+    driver: bridge
 # version: '3.8'
 # services:
 #   postgres:
