@@ -1,17 +1,5 @@
 version: '3'
 services:
-  # postgres:
-  #   image: postgres:latest
-  #   container_name: postgres
-  #   ports:
-  #     - 5432:5432
-  #   environment:
-  #     POSTGRES_USER: postgres
-  #     POSTGRES_PASSWORD: password
-  #     POSTGRES_DB: Persons
-  # volumes:
-  #   - postgres-data:/var/lib/postgresql/data
-  #   restart: unless-stopped
   postgres:
     image: postgres:latest
     container_name: postgres
@@ -23,7 +11,7 @@ services:
     ports:
       - 5432:5432
     volumes:
-      - postgres-data: /var/lib/postgresql/data
+      - postgres-data:/var/lib/postgresql/data
     networks:
       - service
     healthcheck:
@@ -52,10 +40,8 @@ services:
     restart: always
     networks:
       - service
-
 volumes:
   postgres-data:
-
 networks:
   service:
     driver: bridge
