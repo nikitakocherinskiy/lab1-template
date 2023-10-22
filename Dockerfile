@@ -44,7 +44,6 @@ COPY tsconfig.json ./
 RUN npm ci
 RUN npx prisma generate
 COPY . .
-COPY ./dist ./dist
 # RUN npm run prestart:dev
 EXPOSE 8080
 CMD [  "npm", "run", "start:dev" ]
