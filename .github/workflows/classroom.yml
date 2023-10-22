@@ -49,14 +49,14 @@ jobs:
       - name: Run E2E Tests
         run: npm run test:e2e
 
-      - name: Deploy on Render
-        uses: ashishkujoy/render-deploy@v1.0.5
-        with:
-          service-id: ${{ secrets.SERVICE_ID }}
-          service-key: ${{ secrets.SERVICE_KEY }}
-          api-key: ${{ secrets.API_KEY }}
-          max-deployment-wait-ms: 360000
-          delay-in-ms: 10000
+      # - name: Deploy on Render
+      #   uses: ashishkujoy/render-deploy@v1.0.5
+      #   with:
+      #     service-id: ${{ secrets.SERVICE_ID }}
+      #     service-key: ${{ secrets.SERVICE_KEY }}
+      #     api-key: ${{ secrets.API_KEY }}
+      #     max-deployment-wait-ms: 360000
+      #     delay-in-ms: 10000
       # - name: Run API Tests
       #   uses: matt-ball/newman-action@master
       #   with:

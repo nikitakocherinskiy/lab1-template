@@ -32,7 +32,7 @@ RUN npm ci
 RUN npx prisma generate
 # RUN npm run prestart:dev
 EXPOSE 8080
-CMD [  "npm", "run", "start:migrate:start" ]
+CMD [  "npm", "run", "start" ]
 #----------------------------
 
 # FROM node:18 as build
