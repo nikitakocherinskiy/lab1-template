@@ -26,6 +26,8 @@ import {
   ApiOperation,
   ApiParam,
 } from '@nestjs/swagger';
+import { ErrorResponse } from 'src/models/errorResponse';
+import { ValidationErrorResponse } from 'src/models/validationErrorResponse';
 
 @ApiTags('Person REST API operations')
 @Controller('/api/v1/persons')
@@ -74,6 +76,7 @@ export class PersonsController {
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
     description: 'Invalid data',
+    type: ValidationErrorResponse,
   })
   async createPerson(@Body() dto: createPerson, @Res() res: Response) {
     try {
@@ -109,6 +112,7 @@ export class PersonsController {
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
     description: 'Not found Person for ID',
+    type: ErrorResponse,
   })
   @Get('/:id')
   async getPersonById(
@@ -158,10 +162,12 @@ export class PersonsController {
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
     description: 'Invalid data',
+    type: ValidationErrorResponse,
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
     description: 'Not found Person for ID',
+    type: ErrorResponse,
   })
   @UsePipes(new ValidationPipe())
   @Patch('/:id')
